@@ -1,3 +1,7 @@
+import { marked } from "./marked/lib/marked.esm.js";
+//import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
+
+
 export class MarkDownEditor {
   constructor(base, no, editor_id, preview_id) {
     this.no = String(no);
@@ -40,8 +44,13 @@ export class MarkDownEditor {
     });
     //return editor;
     this.editor = editor;
-  }
+    this.toc = null;
 
+  }
+  setToc(toc) {
+    this.toc = toc;
+    this.toc_build();
+  }
   getValue() {
     return this.editor.getValue();
   }
@@ -58,7 +67,7 @@ export class MarkDownEditor {
     convert(editor2.preview_id, value);
   }
 
-  convert(id, markdown) {
+  convert_org(id, markdown) {
     let options = {
       headerIds: false,
       mangle: false,
@@ -67,7 +76,52 @@ export class MarkDownEditor {
     let sanitized = DOMPurify.sanitize(html);
     //document.querySelector('#output').innerHTML = sanitized;
     document.querySelector("#" + id).innerHTML = sanitized;
+    if (this.toc != null) {
+        console.log("building toc");
+    }
   }
+
+  convert(id, markdown) {
+    let options = {
+      headerIds: false,
+      mangle: false,
+    };
+    let html = marked.parse(markdown, options);
+    let sanitized = DOMPurify.sanitize(html);
+    //document.querySelector('#output').innerHTML = sanitized;
+    //console.log("id:" +id);
+    document.querySelector("#" + id).innerHTML = sanitized;
+
+    if (this.toc != null) {
+	    /*
+          const lexer = new marked.Lexer(options);
+	  const tokens = lexer.lex(markdown);
+          console.log("building toc");
+          console.dir(tokens);
+	  */
+	  this.toc_build();
+    }
+
+  }
+  toc_build() {
+       if (this.toc != null) {
+          let options = {
+            headerIds: false,
+            mangle: false,
+          };
+          const lexer = new marked.Lexer(options);
+          let markdown = this.editor.getValue();
+	  const tokens = lexer.lex(markdown);
+          console.log("building toc");
+          console.dir(tokens);
+          for ( let i = 0; i < tokens.length ; i++) {
+                 if (tokens[i].type == 'heading') {
+                    console.log("text:" + tokens[i].text + " " +  tokens[i].depth )
+		 }
+	  }
+      }
+    }
+
   // Reset input text
   reset() {
     let changed = editor.getValue() != defaultInput;

@@ -1,5 +1,8 @@
 import { MarkDownEditor } from "./MarkDownEditor.js";
 import { Contents } from "./Contents.js";
+import { TreeViewNavigation } from "../aria-practices/treeview/js/treeview-navigation.js";
+import { marked } from "./marked/lib/marked.esm.js";
+//import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
 
 var open_button = document.querySelector("#openfile");
 var saveAs_button = document.querySelector("#saveAsfile");
@@ -12,6 +15,8 @@ var split_select = document.querySelector("#split-select");
 var contents_select = document.querySelector("#contents-select");
 var fontsize_number = document.querySelector("#fontsize-number");
 var cursor_color_select = document.querySelector("#cursor-color-select");
+var toc_swtch = document.querySelector("#tocSwtch");
+var toc_toggle = document.querySelector("#tocToggle");
 
 var filepath = null;
 var fileHandle = null;
@@ -96,6 +101,62 @@ cursor_color_select.addEventListener(
   },
   false,
 );
+
+toc_swtch.addEventListener(
+  "click",
+  function (ev) {
+    toc_switch();
+  },
+  false,
+);
+
+toc_toggle.addEventListener(
+  "click",
+  function (ev) {
+    toc_switch();
+  },
+  false,
+);
+function toc_switch() {
+  console.log("toc_switch");
+  console.log(toc_toggle.checked);
+
+  var toc1 = document.querySelector("#toc1");
+  var toc_separator1 = document.querySelector("#toc-separator1");
+  var toc2 = document.querySelector("#toc2");
+  var toc_separator2 = document.querySelector("#toc-separator2");
+  var toc3 = document.querySelector("#toc3");
+  var toc_separator3 = document.querySelector("#toc-separator3");
+
+  if (toc_toggle.checked) {
+    display(toc1, "show");
+    display(toc_separator1, "show");
+    display(toc2, "show");
+    display(toc_separator2, "show");
+    display(toc3, "show");
+    display(toc_separator3, "show");
+  } else  {
+    display(toc1, "hide");
+    display(toc_separator1, "hide");
+    display(toc2, "hide");
+    display(toc_separator2, "hide");
+    display(toc3, "hide");
+    display(toc_separator3, "hide");
+  }
+
+  function display(element, op) {
+    if (op == "show") {
+      if (element.classList.contains("hide")) {
+        element.classList.remove("hide");
+      }
+    } else if (op == "hide") {
+      if (!element.classList.contains("hide")) {
+        element.classList.add("hide");
+      }
+    }
+  }
+
+}
 
 function content_change() {
   //console.log(contents_select.selectedIndex);
@@ -526,14 +587,22 @@ let setupEditor = (editor_id, preview_id) => {
 
   return editor;
 };
-
+/*
 let sessionSync = (editor, editor2) => {
   editor2.setSession(editor.getSession());
   let value = editor2.getValue();
-  convert(editor2.preview_id, value);
+  //convert(editor2.preview_id, value);
+  editor2.convert(editor2.preview_id, value);
 };
-
+*/
+let sessionSync = (editor1, editor2) => {
+  editor2.editor.setSession(editor1.editor.getSession());
+  let value = editor2.getValue();
+  //convert(editor2.editor.preview_id, value);
+  editor2.convert(editor2.editor.preview_id, value);
+};
 // Render markdown text as html
+/*
 let convert = (id, markdown) => {
   let options = {
     headerIds: false,
@@ -544,6 +613,7 @@ let convert = (id, markdown) => {
   //document.querySelector('#output').innerHTML = sanitized;
   document.querySelector("#" + id).innerHTML = sanitized;
 };
+*/
 
 // Reset input text
 let reset = () => {
@@ -772,6 +842,20 @@ for ( let i = 0; i< names.length; i++)  {
 }
 
 
+function test_callback(linkURL, linkName, moveFocus) {
+	    console.log("*updateCallback:"+ linkURL +" ["+ linkName + "] focus:"+ moveFocus)
+}
+
+var toc1 = document.querySelector('#toc1 nav');
+var toc1tree = new TreeViewNavigation(toc1, test_callback);
+
+var toc2 = document.querySelector('#toc2 nav');
+var toc2tree = new TreeViewNavigation(toc2, test_callback);
+
+var toc3 = document.querySelector('#toc3 nav');
+var toc3tree = new TreeViewNavigation(toc3, test_callback);
+
+
 //let editor = new MarkDownEditor(update_sync, 1);
 let editor1 = new MarkDownEditor(update_sync, 1, "editor1", "output1");
 //editor1.presetValue(defaultInput);
@@ -780,13 +864,18 @@ contents_select.options[1].selected = true;
 
 let scrollBarSettings = loadScrollBarSettings() || false;
 editor1.initScrollBarSync(scrollBarSettings);
+editor1.setToc(toc1);
+
+
 
 let editor2 = new MarkDownEditor(update_sync, 2, "editor2", "output2");
 editor2.initScrollBarSync(scrollBarSettings);
 
-sessionSync(editor1.editor, editor2.editor);
+//sessionSync(editor1.editor, editor2.editor);
+sessionSync(editor1, editor2);
 
 let editor3 = new MarkDownEditor(update_sync, 3, "editor3", "output3");
 editor3.initScrollBarSync(scrollBarSettings);
 
-sessionSync(editor1.editor, editor3.editor);
+//sessionSync(editor1.editor, editor3.editor);
+sessionSync(editor1, editor3);

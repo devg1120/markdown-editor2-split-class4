@@ -241,6 +241,10 @@ footer {
 }
 /*-----------------------------*/
 
+.toc.hide {
+     display:none;
+}
+
 .container.hide {
      display:none;
 }
@@ -258,3 +262,11 @@ footer {
     background-color:  red;
 }
 
+.my-checkbox {
+  display: block;
+  position: relative;
+  margin: 1em 0;
+  padding-left: 28px;
+  cursor: pointer;
+  user-select: none; /* テキストの選択を防ぐ */
+}
