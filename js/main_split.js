@@ -1,6 +1,6 @@
 import { MarkDownEditor } from "./MarkDownEditor.js";
 import { Contents } from "./Contents.js";
-import { TreeViewNavigation } from "../aria-practices/treeview/js/treeview-navigation.js";
+//import { TreeViewNavigation } from "../aria-practices/treeview/js/treeview-navigation.js";
 import { marked } from "./marked/lib/marked.esm.js";
 //import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
 
@@ -847,13 +847,13 @@ function test_callback(linkURL, linkName, moveFocus) {
 }
 
 var toc1 = document.querySelector('#toc1 nav');
-var toc1tree = new TreeViewNavigation(toc1, test_callback);
+//var toc1tree = new TreeViewNavigation(toc1, test_callback);
 
 var toc2 = document.querySelector('#toc2 nav');
-var toc2tree = new TreeViewNavigation(toc2, test_callback);
+//var toc2tree = new TreeViewNavigation(toc2, test_callback);
 
 var toc3 = document.querySelector('#toc3 nav');
-var toc3tree = new TreeViewNavigation(toc3, test_callback);
+//var toc3tree = new TreeViewNavigation(toc3, test_callback);
 
 
 //let editor = new MarkDownEditor(update_sync, 1);
@@ -864,7 +864,7 @@ contents_select.options[1].selected = true;
 
 let scrollBarSettings = loadScrollBarSettings() || false;
 editor1.initScrollBarSync(scrollBarSettings);
-editor1.setToc(toc1);
+
 
 
 
@@ -879,3 +879,6 @@ editor3.initScrollBarSync(scrollBarSettings);
 
 //sessionSync(editor1.editor, editor3.editor);
 sessionSync(editor1, editor3);
+editor1.setToc(toc1);
+editor2.setToc(toc2);
+editor3.setToc(toc3);

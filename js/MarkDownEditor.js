@@ -1,16 +1,16 @@
 import { marked } from "./marked/lib/marked.esm.js";
 //import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
-
+import { TreeViewNavigation } from "../aria-practices/treeview/js/treeview-navigation.js";
 
 export class MarkDownEditor {
   constructor(base, no, editor_id, preview_id) {
     this.no = String(no);
     this.update_sync = base;
     this.hasEdited = false;
-    let editor = ace.edit(editor_id);
-    editor.preview_id = preview_id;
-    editor.getSession().setUseWrapMode(true);
-    editor.setOptions({
+    this.editor = ace.edit(editor_id);
+    this.editor.preview_id = preview_id;
+    this.editor.getSession().setUseWrapMode(true);
+    this.editor.setOptions({
       maxLines: Infinity,
       indentedSoftWrap: false,
       //fontSize: 16,
@@ -25,27 +25,26 @@ export class MarkDownEditor {
     });
 
     var MarkdownMode = ace.require("ace/mode/markdown").Mode;
-    editor.session.setMode(new MarkdownMode());
-
+    this.editor.session.setMode(new MarkdownMode());
     //editor.setKeyboardHandler("ace/keyboard/vim");
-    editor.setShowPrintMargin(false);
+    this.editor.setShowPrintMargin(false);
+    this.editor.resize(true);
 
-    editor.on("change", () => {
+    this.editor.on("change", () => {
       //let changed = editor.getValue() != defaultInput;
       //if (changed) {
       //    hasEdited = true;
       //}
       this.hasEdited = true;
-      let value = editor.getValue();
+      let value = this.editor.getValue();
       this.convert(preview_id, value);
       this.update_sync(value);
       //diff_ck_localFileSaveContent(value);
       //saveLastContent(value);
     });
     //return editor;
-    this.editor = editor;
+    //this.editor = editor;
     this.toc = null;
-
   }
   setToc(toc) {
     this.toc = toc;
@@ -77,7 +76,7 @@ export class MarkDownEditor {
     //document.querySelector('#output').innerHTML = sanitized;
     document.querySelector("#" + id).innerHTML = sanitized;
     if (this.toc != null) {
-        console.log("building toc");
+      console.log("building toc");
     }
   }
 
@@ -93,34 +92,256 @@ export class MarkDownEditor {
     document.querySelector("#" + id).innerHTML = sanitized;
 
     if (this.toc != null) {
-	    /*
+      /*
           const lexer = new marked.Lexer(options);
 	  const tokens = lexer.lex(markdown);
           console.log("building toc");
           console.dir(tokens);
 	  */
-	  this.toc_build();
+      this.toc_build();
     }
-
   }
-  toc_build() {
-       if (this.toc != null) {
-          let options = {
-            headerIds: false,
-            mangle: false,
-          };
-          const lexer = new marked.Lexer(options);
-          let markdown = this.editor.getValue();
-	  const tokens = lexer.lex(markdown);
-          console.log("building toc");
-          console.dir(tokens);
-          for ( let i = 0; i < tokens.length ; i++) {
-                 if (tokens[i].type == 'heading') {
-                    console.log("text:" + tokens[i].text + " " +  tokens[i].depth )
-		 }
-	  }
+
+  set_tree(array, level, depth, text, linenum) {
+    //console.log("->text:" + text + " " +  depth )
+    level++;
+    if (level == depth) {
+      array.push({ text: text, depth: depth, child: [], linenum: linenum });
+    } else {
+      if (array.length == 0) {
+        array.push({ text: text, depth: depth, child: [], linenum: linenum });
+      } else {
+        this.set_tree(
+          array[array.length - 1].child,
+          level++,
+          depth,
+          text,
+          linenum,
+        );
       }
     }
+  }
+
+  dump_toctree(array, level) {
+    level++;
+    for (let i = 0; i < array.length; i++) {
+      console.log(
+        "   ".repeat(level - 1) + array[i].text + "    " + array[i].linenum,
+      );
+      if (array[i].child.length > 0) {
+        this.dump_toctree(array[i].child, level);
+      }
+    }
+  }
+
+  /*
+ lineNumberByIndex(index,string){
+var char = string.indexOf(index) ;
+//var line = lineOfChar(string, char) ;
+ return char;
+}
+*/
+
+  lineOf(substring, text) {
+    var line = 1,
+      matchedChars = 0;
+
+    for (var i = 0; i < text.length; i++) {
+      text[i] === substring[matchedChars] ? matchedChars++ : (matchedChars = 0);
+
+      if (matchedChars === substring.length) {
+        return line;
+      }
+      if (text[i] === "\n") {
+        line++;
+      }
+    }
+
+    return -1;
+  }
+
+  toc_build() {
+  let that = this;
+  function toc_callback(linkURL, linkName, moveFocus) {
+    console.log(
+      "*updateCallback:" + linkURL + " [" + linkName + "] focus:" + moveFocus,
+    );
+    let linenum = Number(linkURL.split('#')[1]);
+    console.log(linenum);
+    console.log(that.editor);
+    if (isNaN(linenum)) { return;}
+    that.editor.focus(); 
+    that.editor.scrollToLine(linenum, true, true, function () {});
+    that.editor.gotoLine(linenum, 0, true);
+
+  }
+
+
+    if (this.toc != null) {
+      let options = {
+        headerIds: false,
+        mangle: false,
+      };
+      const lexer = new marked.Lexer(options);
+      let markdown = this.editor.getValue();
+      const tokens = lexer.lex(markdown);
+      //console.log("building toc");
+      //console.dir(tokens);
+
+      this.toctree = [];
+      for (let i = 0; i < tokens.length; i++) {
+        if (tokens[i].type == "heading") {
+          //console.log("text:" + tokens[i].text + " " +  tokens[i].depth )
+          let d = tokens[i].depth;
+          //let linenum =this.lineNumberByIndex( tokens[i].raw.replace('\n',''), markdown);
+          let linenum = this.lineOf(tokens[i].raw.replace("\n", ""), markdown);
+          this.set_tree(this.toctree, 0, d, tokens[i].text, linenum);
+        }
+      }
+      //console.log(this.toctree);
+      this.dump_toctree(this.toctree, 0);
+      //console.log("---------------");
+      //console.log(markdown);
+      //console.log("---------------");
+      let nav = this.create_toc_doc();
+      this.toc.replaceChildren();
+      this.toc.appendChild(nav);
+      //var toc1 = document.querySelector('#toc1 nav');
+      var tocnav = new TreeViewNavigation(this.toc, toc_callback);
+    }
+  }
+
+  toc_subtree(parent_node, tree, label) {
+    let ul = document.createElement("ul");
+    //ul.classList.add("treeview-navigation");
+    ul.setAttribute("id", "id-about-subtree");
+    ul.setAttribute("role", "group");
+    ul.setAttribute("aria-label", label);
+    parent_node.appendChild(ul);
+    for (let i = 0; i < tree.length; i++) {
+      if (tree[i].child.length > 0) {
+        let li = document.createElement("li");
+        li.setAttribute("role", "none");
+        ul.appendChild(li);
+        let a = document.createElement("a");
+        a.setAttribute("role", "treeitem");
+        a.setAttribute("aria-expanded", "false");
+        a.setAttribute("aria-owns", "id-about-subtree");
+        //a.setAttribute("href", "#" + this.conv(tree[i].text));
+        a.setAttribute("href", "#" + tree[i].linenum);
+        a.setAttribute("linenum", tree[i].linenum);
+        li.appendChild(a);
+        let span = document.createElement("span");
+        span.classList.add("label");
+        //span.textContent = this.toctree[i].text;
+        a.appendChild(span);
+        let span2 = document.createElement("span");
+        span2.classList.add("icon");
+        span.appendChild(span2);
+        let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        svg.setAttribute("width", "13");
+        svg.setAttribute("height", "10");
+        svg.setAttribute("viewBox", "0 0 13 10");
+        let polygon = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "polygon",
+        );
+        polygon.setAttribute("points", "2 1, 12 1, 7 9");
+        svg.appendChild(polygon);
+        span2.appendChild(svg);
+        var add_text = document.createTextNode(tree[i].text);
+        span.appendChild(add_text);
+
+        this.toc_subtree(li, tree[i].child, tree[i].text);
+      } else {
+        let li = document.createElement("li");
+        li.setAttribute("role", "none");
+        ul.appendChild(li);
+        let a = document.createElement("a");
+        a.setAttribute("role", "treeitem");
+        //a.setAttribute("href", "#" + this.conv(tree[i].text));
+        a.setAttribute("href", "#" + tree[i].linenum);
+        a.setAttribute("linenum", tree[i].linenum);
+        a.setAttribute("aria-current", "page");
+        li.appendChild(a);
+        let span = document.createElement("span");
+        span.classList.add("label");
+        span.textContent = tree[i].text;
+        a.appendChild(span);
+      }
+    }
+  }
+
+  conv(str) {
+    let str2 = str.replace(" ", "-");
+    let ans = str2.toLowerCase();
+    return ans;
+  }
+  create_toc_doc() {
+    //let nav = document.createElement('nav');
+    // nav.setAttribute('aria-label', 'TOC');
+    let ul = document.createElement("ul");
+    ul.classList.add("treeview-navigation");
+    ul.setAttribute("role", "tree");
+    ul.setAttribute("aria-label", "TOC");
+    //nav.appendChild(ul);
+    for (let i = 0; i < this.toctree.length; i++) {
+      if (this.toctree[i].child.length > 0) {
+        let li = document.createElement("li");
+        li.setAttribute("role", "none");
+        ul.appendChild(li);
+        let a = document.createElement("a");
+        a.setAttribute("role", "treeitem");
+        a.setAttribute("aria-expanded", "false");
+        a.setAttribute("aria-owns", "id-about-subtree");
+        //a.setAttribute("href", "#" + this.conv(this.toctree[i].text));
+        a.setAttribute("href", "#" + this.toctree[i].linenum);
+        a.setAttribute("linenum", this.toctree[i].linenum);
+        li.appendChild(a);
+        let span = document.createElement("span");
+        span.classList.add("label");
+        //span.textContent = this.toctree[i].text;
+        a.appendChild(span);
+        let span2 = document.createElement("span");
+        span2.classList.add("icon");
+        span.appendChild(span2);
+        let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        svg.setAttribute("width", "13");
+        svg.setAttribute("height", "10");
+        svg.setAttribute("viewBox", "0 0 13 10");
+        let polygon = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "polygon",
+        );
+        polygon.setAttribute("points", "2 1, 12 1, 7 9");
+        svg.appendChild(polygon);
+        span2.appendChild(svg);
+        var add_text = document.createTextNode(this.toctree[i].text);
+        span.appendChild(add_text);
+
+        this.toc_subtree(li, this.toctree[i].child, this.toctree[i].text);
+      } else {
+        let li = document.createElement("li");
+        li.setAttribute("role", "none");
+        ul.appendChild(li);
+        let a = document.createElement("a");
+        a.setAttribute("role", "treeitem");
+        //a.setAttribute("href", "#" + this.conv(this.toctree[i].text));
+        a.setAttribute("href", "#" + this.toctree[i].linenum);
+        a.setAttribute("linenum", this.toctree[i].linenum);
+        a.setAttribute("aria-current", "page");
+        li.appendChild(a);
+        let span = document.createElement("span");
+        span.classList.add("label");
+        span.textContent = this.toctree[i].text;
+        a.appendChild(span);
+      }
+    }
+    //return nav;
+    return ul;
+  }
 
   // Reset input text
   reset() {
