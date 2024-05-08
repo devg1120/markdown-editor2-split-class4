@@ -42,6 +42,20 @@ export class MarkDownEditor {
       //diff_ck_localFileSaveContent(value);
       //saveLastContent(value);
     });
+
+    let that = this;
+    this.editor.session.selection.on('changeCursor', function(e) {
+	    let c = that.editor.selection.getCursor();
+	    //console.log("changeCursor:",c);
+            let linenum = Number(c.row) + 1;
+            console.log("changeCursor:", linenum);
+            //that.look_toctree(that.toctree, 0, linenum);
+	    if (that.toctree) {
+               that.lookup_toctree(that.toctree, 0, linenum , false);
+               //that.dump_toctree(that.toctree, 0 );
+	    }
+
+    });
     //return editor;
     //this.editor = editor;
     this.toc = null;
@@ -121,6 +135,21 @@ export class MarkDownEditor {
       }
     }
   }
+
+  lookup_toctree(array, level, linenum, start) {
+    level++;
+    for (let i = 0; i < array.length; i++) {
+      console.log(
+        "   ".repeat(level - 1) + array[i].text + "    " + array[i].linenum,
+      );
+	    
+      
+      if (array[i].child.length > 0) {
+         this.lookup_toctree(array[i].child, level, linenum, start);
+      }
+    }
+  }
+
 
   dump_toctree(array, level) {
     level++;
