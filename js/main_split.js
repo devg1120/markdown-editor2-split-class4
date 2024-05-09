@@ -135,7 +135,7 @@ function toc_switch() {
     display(toc_separator2, "show");
     display(toc3, "show");
     display(toc_separator3, "show");
-  } else  {
+  } else {
     display(toc1, "hide");
     display(toc_separator1, "hide");
     display(toc2, "hide");
@@ -155,7 +155,6 @@ function toc_switch() {
       }
     }
   }
-
 }
 
 function content_change() {
@@ -165,10 +164,9 @@ function content_change() {
 }
 
 function cursor_color_change_() {
-
-   console.log("cursor_color:" + cursor_color_select.value);
-   console.log(document.styleSheets.length);
-/*
+  console.log("cursor_color:" + cursor_color_select.value);
+  console.log(document.styleSheets.length);
+  /*
    for ( var s = 0; s < document.styleSheets.length; s++) {
        const stylesheet = document.styleSheets[s];
        console.log("");
@@ -185,84 +183,83 @@ function cursor_color_change_() {
        }
    }
  */
-       const stylesheet = document.styleSheets[5];
-       //console.dir(stylesheet);
-       const roule33 = document.styleSheets[5].cssRules[33];
-       const roule34 = document.styleSheets[5].cssRules[34];
-       //console.log(roule33);
-       //console.log(roule34);
-       console.log(roule33.selectorText);
-       console.log(roule33.cssText);
-       console.log(roule34.selectorText);
-       console.log(roule34.cssText);
-       //roule33.cssText = "ace_cursor-layer .ace_cursor { border-left: 5px solid blue; color: blue !important; }";
-       //roule34.cssText = ".ace_cursor-layer.ace_overwrite-cursors .ace_cursor { background-color: blue; }";
+  const stylesheet = document.styleSheets[5];
+  //console.dir(stylesheet);
+  const roule33 = document.styleSheets[5].cssRules[33];
+  const roule34 = document.styleSheets[5].cssRules[34];
+  //console.log(roule33);
+  //console.log(roule34);
+  console.log(roule33.selectorText);
+  console.log(roule33.cssText);
+  console.log(roule34.selectorText);
+  console.log(roule34.cssText);
+  //roule33.cssText = "ace_cursor-layer .ace_cursor { border-left: 5px solid blue; color: blue !important; }";
+  //roule34.cssText = ".ace_cursor-layer.ace_overwrite-cursors .ace_cursor { background-color: blue; }";
 
-	roule33.style.borderLeft= "5px solid yellow"
-        roule33.style.borderLeftColor= "yellow"
-        roule33.style.color= "yellow"
-	roule34.style.backgroundColor = "yellow";
- cursor_color_change_() ;
+  roule33.style.borderLeft = "5px solid yellow";
+  roule33.style.borderLeftColor = "yellow";
+  roule33.style.color = "yellow";
+  roule34.style.backgroundColor = "yellow";
+  cursor_color_change_();
 }
 
 function getRoule(selector) {
-   for ( var s = 0; s < document.styleSheets.length; s++) {
-       const stylesheet = document.styleSheets[s];
-       for ( var i = 0; i < stylesheet.cssRules.length ; i++) {
-          if (stylesheet.cssRules[i].selectorText == selector) {
-                return stylesheet.cssRules[i];
-          }
-       }
-   }
-   return null
+  for (var s = 0; s < document.styleSheets.length; s++) {
+    const stylesheet = document.styleSheets[s];
+    for (var i = 0; i < stylesheet.cssRules.length; i++) {
+      if (stylesheet.cssRules[i].selectorText == selector) {
+        return stylesheet.cssRules[i];
+      }
+    }
+  }
+  return null;
 }
 
 function cursor_color_change() {
-   console.log("cursor_color:" + cursor_color_select.value);
-   let cursor_color = cursor_color_select.value;
+  console.log("cursor_color:" + cursor_color_select.value);
+  let cursor_color = cursor_color_select.value;
 
- let style_order = [
-	 {
-		 selector: ".ace_cursor-layer .ace_cursor",
-                 style: {
-			 borderLeft:"5px solid $",
-			 borderLeftColor: "$",
-                         color: "$"
-		 }
-	 },
-	 {
-		 selector: ".ace_cursor-layer.ace_overwrite-cursors .ace_cursor",
-                 style: {
-			 backgroundColor : "$",
-		 }
-	 }
+  let style_order = [
+    {
+      selector: ".ace_cursor-layer .ace_cursor",
+      style: {
+        borderLeft: "5px solid $",
+        borderLeftColor: "$",
+        color: "$",
+      },
+    },
+    {
+      selector: ".ace_cursor-layer.ace_overwrite-cursors .ace_cursor",
+      style: {
+        backgroundColor: "$",
+      },
+    },
   ];
   for (let i = 0; i < style_order.length; i++) {
-            //console.log(">>"+style_order[i].selector);
-            let roule = getRoule(style_order[i].selector);
-            if (roule == null ) {
-                 console.log("css null:" + style_order[i].selector);
-
-	    } else {
-                 console.log(roule);
-                 for  (name in style_order[i].style) {
-                    let value = style_order[i].style[name];
-                    //console.log(name + ":" + value);
-                    value = value.replace("$",cursor_color);
-                    let cmd = "roule.style." + name + "=\"" + value + "\";";
-                    //console.log(cmd);
-                    eval(cmd);
-		 }
-	    }
+    //console.log(">>"+style_order[i].selector);
+    let roule = getRoule(style_order[i].selector);
+    if (roule == null) {
+      console.log("css null:" + style_order[i].selector);
+    } else {
+      console.log(roule);
+      for (name in style_order[i].style) {
+        let value = style_order[i].style[name];
+        //console.log(name + ":" + value);
+        value = value.replace("$", cursor_color);
+        let cmd = "roule.style." + name + '="' + value + '";';
+        //console.log(cmd);
+        eval(cmd);
+      }
+    }
   }
 }
 
 function fontsize_change() {
-   //console.log("fontsize:" + fontsize_number.value);
-   var size = Number(fontsize_number.value);
-   editor1.setFontSize(size);
-   editor2.setFontSize(size);
-   editor3.setFontSize(size);
+  //console.log("fontsize:" + fontsize_number.value);
+  var size = Number(fontsize_number.value);
+  editor1.setFontSize(size);
+  editor2.setFontSize(size);
+  editor3.setFontSize(size);
 }
 
 function splitting() {
@@ -832,29 +829,29 @@ let contents = new Contents();
 
 let names = contents.getNamelist();
 
-for ( let i = 0; i< names.length; i++)  {
-    //console.log(names[i]);
-    let name = names[i];
-    const option = document.createElement('option');
-    option.value = name;
-    option.textContent = name;
-    contents_select.appendChild(option)
+for (let i = 0; i < names.length; i++) {
+  //console.log(names[i]);
+  let name = names[i];
+  const option = document.createElement("option");
+  option.value = name;
+  option.textContent = name;
+  contents_select.appendChild(option);
 }
-
 
 function test_callback(linkURL, linkName, moveFocus) {
-	    console.log("*updateCallback:"+ linkURL +" ["+ linkName + "] focus:"+ moveFocus)
+  console.log(
+    "*updateCallback:" + linkURL + " [" + linkName + "] focus:" + moveFocus,
+  );
 }
 
-var toc1 = document.querySelector('#toc1 nav');
+var toc1 = document.querySelector("#toc1 nav");
 //var toc1tree = new TreeViewNavigation(toc1, test_callback);
 
-var toc2 = document.querySelector('#toc2 nav');
+var toc2 = document.querySelector("#toc2 nav");
 //var toc2tree = new TreeViewNavigation(toc2, test_callback);
 
-var toc3 = document.querySelector('#toc3 nav');
+var toc3 = document.querySelector("#toc3 nav");
 //var toc3tree = new TreeViewNavigation(toc3, test_callback);
-
 
 //let editor = new MarkDownEditor(update_sync, 1);
 let editor1 = new MarkDownEditor(update_sync, 1, "editor1", "output1");
@@ -864,9 +861,6 @@ contents_select.options[1].selected = true;
 
 let scrollBarSettings = loadScrollBarSettings() || false;
 editor1.initScrollBarSync(scrollBarSettings);
-
-
-
 
 let editor2 = new MarkDownEditor(update_sync, 2, "editor2", "output2");
 editor2.initScrollBarSync(scrollBarSettings);

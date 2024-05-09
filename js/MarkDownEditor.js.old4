@@ -42,46 +42,59 @@ export class MarkDownEditor {
       //diff_ck_localFileSaveContent(value);
       //saveLastContent(value);
     });
+/*
+<a role="treeitem" href="#37" linenum="37" tabindex="0" aria-current="page">
+		  <span class="label">Images</span>
+</a>
+*/
     let that = this;
+    this.editor.session.selection.on('changeCursor', function(e) {
+	    let c = that.editor.selection.getCursor();
+	    //console.log("changeCursor:",c);
+            let linenum = Number(c.row) + 1;
+            console.log("changeCursor:", linenum);
+            //that.look_toctree(that.toctree, 0, linenum);
+	    if (that.toctree) {
+               //that.lookup_toctree(that.toctree, 0, linenum , false);
+               //that.dump_toctree(that.toctree, 0 );
+               //   let nav = document.querySelector('.toc nav');
+	      //   console.log(nav);
+	    }
+	    if (that.toc_index) {
+                  //console.log("toc_index:", that.toc_index.length);
+                  console.log("toc_index:", that.toc_index);
+		    //hasAttribute
+		    //removeAttribute
+		   for (let i = 0; i < that.toc_index.length ; i++) {
+                          if (that.toc_index[i].element.hasAttribute("aria-current")) {
+                               that.toc_index[i].element.removeAttribute("aria-current");
+			  }
+		   }
+		   let  match = false;
+		   for (let i = 0; i < that.toc_index.length-1 ; i++) {
+		        let a = Number(that.toc_index[i].linenum)
+		        let b = Number(that.toc_index[i+1].linenum)
+                        if ( a <= linenum && linenum < b) {
+		          console.log(that.toc_index[i].text);
+                          that.toc_index[i].element.setAttribute("aria-current", "page");
+		          match = true;
+                          break;
+			}
+		   }
+                   if( !match ) {
+		        let i = that.toc_index.length-1;
+		        let a = Number(that.toc_index[i].linenum)
+                        if ( a <= linenum ) {
+		          console.log(that.toc_index[i].text);
+                          that.toc_index[i].element.setAttribute("aria-current", "page");
+			}
+                   }
 
-    this.editor.session.selection.on("changeCursor", function (e) {
-      let c = that.editor.selection.getCursor();
-      let linenum = Number(c.row) + 1;
-      if (that.toc_index) {
-        console.log("toc_index:", that.toc_index);
-        if (that.toc_index.length == 0 ) {
-              console.log("toc_index: enpty!!");
-		return;
+	    }
 
-	}
-        for (let i = 0; i < that.toc_index.length; i++) {
-          if (that.toc_index[i].element.hasAttribute("aria-current")) {
-            that.toc_index[i].element.removeAttribute("aria-current");
-          }
-        }
-        let match = false;
-        for (let i = 0; i < that.toc_index.length - 1; i++) {
-          let a = Number(that.toc_index[i].linenum);
-          let b = Number(that.toc_index[i + 1].linenum);
-          if (a <= linenum && linenum < b) {
-            //console.log(that.toc_index[i].text);
-            that.toc_index[i].element.setAttribute("aria-current", "page");
-            match = true;
-            break;
-          }
-        }
-        if (!match) {
-          let i = that.toc_index.length - 1;
-          let a = Number(that.toc_index[i].linenum);
-          if (a <= linenum) {
-           // console.log(that.toc_index[i].text);
-            that.toc_index[i].element.setAttribute("aria-current", "page");
-          }
-        }
-      }
     });
-
-    
+    //return editor;
+    //this.editor = editor;
     this.toc = null;
   }
   setToc(toc) {
@@ -163,15 +176,17 @@ export class MarkDownEditor {
   lookup_toctree(array, level, linenum, start) {
     level++;
     for (let i = 0; i < array.length; i++) {
-      //console.log(
-      //  "   ".repeat(level - 1) + array[i].text + "    " + array[i].linenum,
-      //);
-
+      console.log(
+        "   ".repeat(level - 1) + array[i].text + "    " + array[i].linenum,
+      );
+	    
+      
       if (array[i].child.length > 0) {
-        this.lookup_toctree(array[i].child, level, linenum, start);
+         this.lookup_toctree(array[i].child, level, linenum, start);
       }
     }
   }
+
 
   dump_toctree(array, level) {
     level++;
@@ -212,22 +227,22 @@ var char = string.indexOf(index) ;
   }
 
   toc_build() {
-    let that = this;
+  let that = this;
 
-    function toc_callback(linkURL, linkName, moveFocus) {
-      //console.log(
-      //  "*updateCallback:" + linkURL + " [" + linkName + "] focus:" + moveFocus,
-      //);
-      let linenum = Number(linkURL.split("#")[1]);
-      //console.log(linenum);
-      //console.log(that.editor);
-      if (isNaN(linenum)) {
-        return;
-      }
-      that.editor.focus();
-      that.editor.scrollToLine(linenum, true, true, function () {});
-      that.editor.gotoLine(linenum, 0, true);
-    }
+  function toc_callback(linkURL, linkName, moveFocus) {
+    //console.log(
+    //  "*updateCallback:" + linkURL + " [" + linkName + "] focus:" + moveFocus,
+    //);
+    let linenum = Number(linkURL.split('#')[1]);
+    //console.log(linenum);
+    //console.log(that.editor);
+    if (isNaN(linenum)) { return;}
+    that.editor.focus(); 
+    that.editor.scrollToLine(linenum, true, true, function () {});
+    that.editor.gotoLine(linenum, 0, true);
+
+  }
+
 
     if (this.toc != null) {
       let options = {
@@ -250,6 +265,7 @@ var char = string.indexOf(index) ;
           this.set_tree(this.toctree, 0, d, tokens[i].text, linenum);
         }
       }
+
 
       //console.log(this.toctree);
       this.dump_toctree(this.toctree, 0);
@@ -284,12 +300,8 @@ var char = string.indexOf(index) ;
         a.setAttribute("href", "#" + tree[i].linenum);
         a.setAttribute("linenum", tree[i].linenum);
         li.appendChild(a);
-        //this.toc_index.push({linenum:tree[i].linenum, element:a});
-        this.toc_index.push({
-          linenum: tree[i].linenum,
-          text: tree[i].text,
-          element: a,
-        });
+          //this.toc_index.push({linenum:tree[i].linenum, element:a});
+          this.toc_index.push({linenum:tree[i].linenum, text:tree[i].text ,element:a});
         let span = document.createElement("span");
         span.classList.add("label");
         //span.textContent = this.toctree[i].text;
@@ -324,11 +336,7 @@ var char = string.indexOf(index) ;
         a.setAttribute("linenum", tree[i].linenum);
         a.setAttribute("aria-current", "page");
         li.appendChild(a);
-        this.toc_index.push({
-          linenum: tree[i].linenum,
-          text: tree[i].text,
-          element: a,
-        });
+          this.toc_index.push({linenum:tree[i].linenum, text:tree[i].text ,element:a});
         let span = document.createElement("span");
         span.classList.add("label");
         span.textContent = tree[i].text;
@@ -343,6 +351,7 @@ var char = string.indexOf(index) ;
     return ans;
   }
   create_toc_doc() {
+
     this.toc_index = [];
     //let nav = document.createElement('nav');
     // nav.setAttribute('aria-label', 'TOC');
@@ -364,12 +373,8 @@ var char = string.indexOf(index) ;
         a.setAttribute("href", "#" + this.toctree[i].linenum);
         a.setAttribute("linenum", this.toctree[i].linenum);
         li.appendChild(a);
-        //this.toc_index.push({linenum:this.toctree[i].linenum, element:a});
-        this.toc_index.push({
-          linenum: this.toctree[i].linenum,
-          text: this.toctree[i].text,
-          element: a,
-        });
+          //this.toc_index.push({linenum:this.toctree[i].linenum, element:a});
+          this.toc_index.push({linenum:this.toctree[i].linenum, text:this.toctree[i].text ,element:a});
         let span = document.createElement("span");
         span.classList.add("label");
         //span.textContent = this.toctree[i].text;
@@ -404,12 +409,8 @@ var char = string.indexOf(index) ;
         a.setAttribute("linenum", this.toctree[i].linenum);
         a.setAttribute("aria-current", "page");
         li.appendChild(a);
-        //this.toc_index.push({linenum:this.toctree[i].linenum, element:a});
-        this.toc_index.push({
-          linenum: this.toctree[i].linenum,
-          text: this.toctree[i].text,
-          element: a,
-        });
+          //this.toc_index.push({linenum:this.toctree[i].linenum, element:a});
+          this.toc_index.push({linenum:this.toctree[i].linenum, text:this.toctree[i].text ,element:a});
         let span = document.createElement("span");
         span.classList.add("label");
         span.textContent = this.toctree[i].text;
