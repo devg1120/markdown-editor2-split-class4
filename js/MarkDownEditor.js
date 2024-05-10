@@ -3,7 +3,9 @@ import { marked } from "./marked/lib/marked.esm.js";
 import { TreeViewNavigation } from "../aria-practices/treeview/js/treeview-navigation.js";
 
 export class MarkDownEditor {
-  constructor(base, no, editor_id, preview_id) {
+  constructor(name, base, no, editor_id, preview_id) {
+    this.active = false;
+    this.name = name;
     this.no = String(no);
     this.update_sync = base;
     this.hasEdited = false;
@@ -52,8 +54,12 @@ export class MarkDownEditor {
     		        }, 10);
     });
 
-
+    this.editor.on("focus", function() {console.log("focus:"+ that.name);that.active = true;  });
+    this.editor.on("blur",  function() {console.log("blur:" + that.name);that.active = false;  });
     this.editor.session.selection.on("changeCursor", function (e) {
+      //console.log(that.editor.isFocused());
+      //if (!that.active) { return;}
+
       let c = that.editor.selection.getCursor();
       let linenum = Number(c.row) + 1;
       if (that.toc_index) {

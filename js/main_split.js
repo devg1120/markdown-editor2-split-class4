@@ -894,7 +894,7 @@ var toc3 = document.querySelector("#toc3 nav");
 //var toc3tree = new TreeViewNavigation(toc3, test_callback);
 
 //let editor = new MarkDownEditor(update_sync, 1);
-let editor1 = new MarkDownEditor(update_sync, 1, "editor1", "output1");
+let editor1 = new MarkDownEditor("editor1",update_sync, 1, "editor1", "output1");
 //editor1.presetValue(defaultInput);
 editor1.presetValue(contents.getContent("content1"));
 contents_select.options[1].selected = true;
@@ -902,13 +902,13 @@ contents_select.options[1].selected = true;
 let scrollBarSettings = loadScrollBarSettings() || false;
 editor1.initScrollBarSync(scrollBarSettings);
 
-let editor2 = new MarkDownEditor(update_sync, 2, "editor2", "output2");
+let editor2 = new MarkDownEditor("editor2",update_sync, 2, "editor2", "output2");
 editor2.initScrollBarSync(scrollBarSettings);
 
 //sessionSync(editor1.editor, editor2.editor);
 sessionSync(editor1, editor2);
 
-let editor3 = new MarkDownEditor(update_sync, 3, "editor3", "output3");
+let editor3 = new MarkDownEditor("editor3",update_sync, 3, "editor3", "output3");
 editor3.initScrollBarSync(scrollBarSettings);
 
 //sessionSync(editor1.editor, editor3.editor);
