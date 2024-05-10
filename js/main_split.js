@@ -905,13 +905,11 @@ editor1.initScrollBarSync(scrollBarSettings);
 let editor2 = new MarkDownEditor("editor2",update_sync, 2, "editor2", "output2");
 editor2.initScrollBarSync(scrollBarSettings);
 
-//sessionSync(editor1.editor, editor2.editor);
 sessionSync(editor1, editor2);
 
 let editor3 = new MarkDownEditor("editor3",update_sync, 3, "editor3", "output3");
 editor3.initScrollBarSync(scrollBarSettings);
 
-//sessionSync(editor1.editor, editor3.editor);
 sessionSync(editor1, editor3);
 editor1.setToc(toc1);
 editor2.setToc(toc2);

@@ -56,9 +56,14 @@ export class MarkDownEditor {
 
     this.editor.on("focus", function() {console.log("focus:"+ that.name);that.active = true;  });
     this.editor.on("blur",  function() {console.log("blur:" + that.name);that.active = false;  });
-    this.editor.session.selection.on("changeCursor", function (e) {
-      //console.log(that.editor.isFocused());
-      //if (!that.active) { return;}
+
+    //domElement.addEventListener('click', (event) =>
+    //  openCodeEditor(event, domElement, language)
+    //);
+
+    //this.editor.session.selection.on("changeCursor", function (e) {
+    this.editor.on("click", function (e) {
+setTimeout(function() {
 
       let c = that.editor.selection.getCursor();
       let linenum = Number(c.row) + 1;
@@ -94,6 +99,8 @@ export class MarkDownEditor {
           }
         }
       }
+}, 30);
+
     });
 
     
