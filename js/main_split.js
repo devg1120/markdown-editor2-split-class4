@@ -15,6 +15,7 @@ var split_select = document.querySelector("#split-select");
 var contents_select = document.querySelector("#contents-select");
 var fontsize_number = document.querySelector("#fontsize-number");
 var cursor_color_select = document.querySelector("#cursor-color-select");
+var separator_color_select = document.querySelector("#separator-color-select");
 var toc_swtch = document.querySelector("#tocSwtch");
 var toc_toggle = document.querySelector("#tocToggle");
 
@@ -98,6 +99,14 @@ cursor_color_select.addEventListener(
   "input",
   function (ev) {
     cursor_color_change();
+  },
+  false,
+);
+
+separator_color_select.addEventListener(
+  "input",
+  function (ev) {
+    separator_color_change();
   },
   false,
 );
@@ -246,6 +255,37 @@ function cursor_color_change() {
         let value = style_order[i].style[name];
         //console.log(name + ":" + value);
         value = value.replace("$", cursor_color);
+        let cmd = "roule.style." + name + '="' + value + '";';
+        //console.log(cmd);
+        eval(cmd);
+      }
+    }
+  }
+}
+
+function separator_color_change() {
+  console.log("separator_color:" + separator_color_select.value);
+  let _color = separator_color_select.value;
+
+  let style_order = [
+    {
+      selector: ".separator",
+      style: {
+        backgroundColor: "$",
+      },
+    },
+  ];
+  for (let i = 0; i < style_order.length; i++) {
+    //console.log(">>"+style_order[i].selector);
+    let roule = getRoule(style_order[i].selector);
+    if (roule == null) {
+      console.log("css null:" + style_order[i].selector);
+    } else {
+      console.log(roule);
+      for (name in style_order[i].style) {
+        let value = style_order[i].style[name];
+        //console.log(name + ":" + value);
+        value = value.replace("$", _color);
         let cmd = "roule.style." + name + '="' + value + '";';
         //console.log(cmd);
         eval(cmd);

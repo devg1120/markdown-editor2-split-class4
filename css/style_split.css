@@ -167,7 +167,10 @@ footer {
 
 .separator {
    background-color: #FF8000; 
-  /* background-color: #0d1117; */
+}
+
+.separator.green {
+   background-color: #00ff40; 
 }
 
 /*

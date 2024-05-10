@@ -42,7 +42,16 @@ export class MarkDownEditor {
       //diff_ck_localFileSaveContent(value);
       //saveLastContent(value);
     });
+
     let that = this;
+
+    this.editor.on("dblclick", function () {
+    	    setTimeout(() => {
+    		            var selected_word = that.editor.getSelectedText();
+    		            console.log("dbclick select:" +selected_word);
+    		        }, 10);
+    });
+
 
     this.editor.session.selection.on("changeCursor", function (e) {
       let c = that.editor.selection.getCursor();
