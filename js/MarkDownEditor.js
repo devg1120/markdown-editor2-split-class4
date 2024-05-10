@@ -48,7 +48,7 @@ export class MarkDownEditor {
       let c = that.editor.selection.getCursor();
       let linenum = Number(c.row) + 1;
       if (that.toc_index) {
-        console.log("toc_index:", that.toc_index);
+        //console.log("toc_index:", that.toc_index);
         if (that.toc_index.length == 0 ) {
               console.log("toc_index: enpty!!");
 		return;
@@ -251,11 +251,7 @@ var char = string.indexOf(index) ;
         }
       }
 
-      //console.log(this.toctree);
-      this.dump_toctree(this.toctree, 0);
-      //console.log("---------------");
-      //console.log(markdown);
-      //console.log("---------------");
+      //this.dump_toctree(this.toctree, 0);
       let nav = this.create_toc_doc();
       this.toc.replaceChildren();
       this.toc.appendChild(nav);
@@ -493,6 +489,9 @@ var char = string.indexOf(index) ;
     preview.classList.add("dark");
 
     this.editor.setTheme("ace/theme/one_dark");
+
+    var toc = document.querySelector("#toc" + this.no);
+    toc.classList.add("dark");
   }
 
   schemeChange_light() {
@@ -505,5 +504,8 @@ var char = string.indexOf(index) ;
     preview.classList.add("light");
 
     this.editor.setTheme("ace/theme/chrome");
+
+    var toc = document.querySelector("#toc" + this.no);
+    toc.classList.remove("dark");
   }
 }

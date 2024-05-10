@@ -76,10 +76,11 @@
   padding: 4px;
   padding-left: 9px;
   text-decoration: none;
-  color: #005a9c;
+  color: #005a9c;  
   border: none;
   display: block;
 }
+
 
 .treeview-navigation a[role="treeitem"][aria-current] {
   border-left: 5px solid #005a9c;

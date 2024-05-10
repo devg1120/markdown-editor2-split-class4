@@ -270,3 +270,30 @@ footer {
   cursor: pointer;
   user-select: none; /* テキストの選択を防ぐ */
 }
+
+
+/* toc color */
+
+.toc.dark {
+
+  background-color:  #282c34; /*#182025; */
+
+}
+
+.toc.dark > nav > .treeview-navigation a[role="treeitem"] {
+   color: #00cc66;
+}
+
+.toc.dark > nav >.treeview-navigation a[role="treeitem"][aria-current] {
+  border-left: 5px solid #00cc66;
+  background-color: #626c7f;
+}
+
+.toc.dark > nav > .treeview-navigation a[role="treeitem"]:focus {
+  border: 2px #00cc66 solid;
+}
+
+.toc.dark > nav > .treeview-navigation a[role="treeitem"]:hover {
+  background-color: #626c7f;
+  border-left: 5px solid #00cc66;
+}
