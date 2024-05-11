@@ -63,12 +63,20 @@ export class MarkDownEditor {
 
     //this.editor.session.selection.on("changeCursor", function (e) {
     this.editor.on("click", function (e) {
-             setTimeout(function() {
+
+	     console.log("editor click");
+
+	    /*
+	     *
+	    <a role="treeitem" aria-expanded="true" aria-owns="id-about-subtree" href="#6" linenum="6" tabindex="-1"><span class="label"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="10" viewBox="0 0 13 10"><polygon points="2 1, 12 1, 7 9"></polygon></svg></span>This is a Heading h1</span></a>
+	     *
+	     */
+             //setTimeout(function() {
              
                    let c = that.editor.selection.getCursor();
                    let linenum = Number(c.row) + 1;
                    if (that.toc_index) {
-                     //console.log("toc_index:", that.toc_index);
+                     console.log("toc_index:", that.toc_index);
                      if (that.toc_index.length == 0 ) {
                            console.log("toc_index: enpty!!");
              		return;
@@ -80,6 +88,7 @@ export class MarkDownEditor {
                        }
                      }
                      let match = false;
+                     let match_index = 0;
                      for (let i = 0; i < that.toc_index.length - 1; i++) {
                        let a = Number(that.toc_index[i].linenum);
                        let b = Number(that.toc_index[i + 1].linenum);
@@ -87,6 +96,7 @@ export class MarkDownEditor {
                          //console.log(that.toc_index[i].text);
                          that.toc_index[i].element.setAttribute("aria-current", "page");
                          match = true;
+                         match_index = i;
                          break;
                        }
                      }
@@ -96,10 +106,25 @@ export class MarkDownEditor {
                        if (a <= linenum) {
                         // console.log(that.toc_index[i].text);
                          that.toc_index[i].element.setAttribute("aria-current", "page");
+                         match_index = i;
                        }
                      }
+                    //console.log("match_index:" + match_index);
+                     if (match_index >0) {
+                         for ( let i = match_index -1 ; i => 0 ; i--) {
+                              if (that.toc_index[i].subtree){
+                                  //console.log(that.toc_index[i].text);
+                                  that.toc_index[i].element.setAttribute("aria-expanded", "true");
+		  	      }
+                              if (that.toc_index[i].level == 1) {
+				      break;
+			      }
+
+
+			 }
+		     }
                    }
-             }, 30);
+             //}, 3);
 
     });
 
@@ -282,7 +307,8 @@ var char = string.indexOf(index) ;
     }
   }
 
-  toc_subtree(parent_node, tree, label) {
+  toc_subtree(parent_node, tree, label, level) {
+    level++;
     let ul = document.createElement("ul");
     //ul.classList.add("treeview-navigation");
     ul.setAttribute("id", "id-about-subtree");
@@ -306,6 +332,8 @@ var char = string.indexOf(index) ;
         this.toc_index.push({
           linenum: tree[i].linenum,
           text: tree[i].text,
+          level: level,
+          subtree: true,
           element: a,
         });
         let span = document.createElement("span");
@@ -330,7 +358,7 @@ var char = string.indexOf(index) ;
         var add_text = document.createTextNode(tree[i].text);
         span.appendChild(add_text);
 
-        this.toc_subtree(li, tree[i].child, tree[i].text);
+        this.toc_subtree(li, tree[i].child, tree[i].text, level);
       } else {
         let li = document.createElement("li");
         li.setAttribute("role", "none");
@@ -345,6 +373,8 @@ var char = string.indexOf(index) ;
         this.toc_index.push({
           linenum: tree[i].linenum,
           text: tree[i].text,
+          level: level,
+          subtree: false,
           element: a,
         });
         let span = document.createElement("span");
@@ -369,6 +399,7 @@ var char = string.indexOf(index) ;
     ul.setAttribute("role", "tree");
     ul.setAttribute("aria-label", "TOC");
     //nav.appendChild(ul);
+    let level = 1;
     for (let i = 0; i < this.toctree.length; i++) {
       if (this.toctree[i].child.length > 0) {
         let li = document.createElement("li");
@@ -386,6 +417,8 @@ var char = string.indexOf(index) ;
         this.toc_index.push({
           linenum: this.toctree[i].linenum,
           text: this.toctree[i].text,
+          level: level,
+          subtree: true,
           element: a,
         });
         let span = document.createElement("span");
@@ -410,7 +443,7 @@ var char = string.indexOf(index) ;
         var add_text = document.createTextNode(this.toctree[i].text);
         span.appendChild(add_text);
 
-        this.toc_subtree(li, this.toctree[i].child, this.toctree[i].text);
+        this.toc_subtree(li, this.toctree[i].child, this.toctree[i].text, level);
       } else {
         let li = document.createElement("li");
         li.setAttribute("role", "none");
@@ -426,6 +459,8 @@ var char = string.indexOf(index) ;
         this.toc_index.push({
           linenum: this.toctree[i].linenum,
           text: this.toctree[i].text,
+          level: level,
+          subtree: false,
           element: a,
         });
         let span = document.createElement("span");
