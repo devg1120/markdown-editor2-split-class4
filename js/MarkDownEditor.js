@@ -66,11 +66,7 @@ export class MarkDownEditor {
 
 	     console.log("editor click");
 
-	    /*
-	     *
-	    <a role="treeitem" aria-expanded="true" aria-owns="id-about-subtree" href="#6" linenum="6" tabindex="-1"><span class="label"><span class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="13" height="10" viewBox="0 0 13 10"><polygon points="2 1, 12 1, 7 9"></polygon></svg></span>This is a Heading h1</span></a>
-	     *
-	     */
+	    
              //setTimeout(function() {
              
                    let c = that.editor.selection.getCursor();
