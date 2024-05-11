@@ -222,9 +222,15 @@ footer {
 .editor-wrapper {
    /* border-right: 8px solid #eee; */
 }
+
+.preview.dark {
+  background-color:  #282c34; /*#182025; */
+}
+
 .preview-wrapper.dark {
   /* padding: 8px 0 8px 8px; */
-   border-left: 15px solid #0d1117; 
+  /* border-left: 15px solid #0d1117; */
+   border-left: 15px solid #282c34; 
 }
 .preview-wrapper.light {
   /* padding: 8px 0 8px 8px; */
@@ -274,6 +280,12 @@ footer {
   user-select: none; /* テキストの選択を防ぐ */
 }
 
+
+.content.markdown-body.dark {
+
+  background-color:  #282c34; /*#182025; */
+
+}
 
 /* toc color */
 

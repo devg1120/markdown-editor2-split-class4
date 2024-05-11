@@ -63,43 +63,43 @@ export class MarkDownEditor {
 
     //this.editor.session.selection.on("changeCursor", function (e) {
     this.editor.on("click", function (e) {
-setTimeout(function() {
-
-      let c = that.editor.selection.getCursor();
-      let linenum = Number(c.row) + 1;
-      if (that.toc_index) {
-        //console.log("toc_index:", that.toc_index);
-        if (that.toc_index.length == 0 ) {
-              console.log("toc_index: enpty!!");
-		return;
-
-	}
-        for (let i = 0; i < that.toc_index.length; i++) {
-          if (that.toc_index[i].element.hasAttribute("aria-current")) {
-            that.toc_index[i].element.removeAttribute("aria-current");
-          }
-        }
-        let match = false;
-        for (let i = 0; i < that.toc_index.length - 1; i++) {
-          let a = Number(that.toc_index[i].linenum);
-          let b = Number(that.toc_index[i + 1].linenum);
-          if (a <= linenum && linenum < b) {
-            //console.log(that.toc_index[i].text);
-            that.toc_index[i].element.setAttribute("aria-current", "page");
-            match = true;
-            break;
-          }
-        }
-        if (!match) {
-          let i = that.toc_index.length - 1;
-          let a = Number(that.toc_index[i].linenum);
-          if (a <= linenum) {
-           // console.log(that.toc_index[i].text);
-            that.toc_index[i].element.setAttribute("aria-current", "page");
-          }
-        }
-      }
-}, 30);
+             setTimeout(function() {
+             
+                   let c = that.editor.selection.getCursor();
+                   let linenum = Number(c.row) + 1;
+                   if (that.toc_index) {
+                     //console.log("toc_index:", that.toc_index);
+                     if (that.toc_index.length == 0 ) {
+                           console.log("toc_index: enpty!!");
+             		return;
+             
+                	}
+                     for (let i = 0; i < that.toc_index.length; i++) {
+                       if (that.toc_index[i].element.hasAttribute("aria-current")) {
+                         that.toc_index[i].element.removeAttribute("aria-current");
+                       }
+                     }
+                     let match = false;
+                     for (let i = 0; i < that.toc_index.length - 1; i++) {
+                       let a = Number(that.toc_index[i].linenum);
+                       let b = Number(that.toc_index[i + 1].linenum);
+                       if (a <= linenum && linenum < b) {
+                         //console.log(that.toc_index[i].text);
+                         that.toc_index[i].element.setAttribute("aria-current", "page");
+                         match = true;
+                         break;
+                       }
+                     }
+                     if (!match) {
+                       let i = that.toc_index.length - 1;
+                       let a = Number(that.toc_index[i].linenum);
+                       if (a <= linenum) {
+                        // console.log(that.toc_index[i].text);
+                         that.toc_index[i].element.setAttribute("aria-current", "page");
+                       }
+                     }
+                   }
+             }, 30);
 
     });
 
@@ -506,9 +506,12 @@ var char = string.indexOf(index) ;
     output.classList.remove("light");
     output.classList.add("dark");
 
-    var preview = document.querySelector("#preview-wrapper" + this.no);
+    var preview = document.querySelector("#preview" + this.no);
     preview.classList.remove("light");
     preview.classList.add("dark");
+    var preview_w = document.querySelector("#preview-wrapper" + this.no);
+    preview_w.classList.remove("light");
+    preview_w.classList.add("dark");
 
     this.editor.setTheme("ace/theme/one_dark");
 
@@ -518,12 +521,15 @@ var char = string.indexOf(index) ;
 
   schemeChange_light() {
     var output = document.querySelector("#output" + this.no);
-    output.classList.remove("dart");
+    output.classList.remove("dark");
     output.classList.add("light");
 
-    var preview = document.querySelector("#preview-wrapper" + this.no);
-    preview.classList.remove("dart");
+    var preview = document.querySelector("#preview" + this.no);
+    preview.classList.remove("dark");
     preview.classList.add("light");
+    var preview_w = document.querySelector("#preview-wrapper" + this.no);
+    preview_w.classList.remove("dark");
+    preview_w.classList.add("light");
 
     this.editor.setTheme("ace/theme/chrome");
 
